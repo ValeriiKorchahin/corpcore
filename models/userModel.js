@@ -1,4 +1,4 @@
-import Sequelize  from 'sequelize';
+import Sequelize from 'sequelize';
 import { sequelize } from '../database/database.js';
 import Roles from '../utils/enums/roles.js';
 
@@ -28,8 +28,7 @@ const UserModel = sequelize.define('user', {
         allowNull: false,
     },
 }, {
-    createdAt: false,
-    updatedAt: false,
+    timestamps: true,
 });
 
 export default UserModel;

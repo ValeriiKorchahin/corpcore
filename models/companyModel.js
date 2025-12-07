@@ -5,24 +5,38 @@ const CompanyModel = sequelize.define('company', {
     id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
         allowNull: false,
     },
     name: {
         type: Sequelize.STRING,
         allowNull: false,
     },
-    logoUrl : {
+    logoUrl: {
         type: Sequelize.STRING,
     },
-    createdByUserId: {
-        type: Sequelize.UUID,
+    country: {
+        type: Sequelize.STRING,
         allowNull: false,
     },
-    organizationId: {
-        type: Sequelize.UUID,
+    phone: {
+        type: Sequelize.STRING,
         allowNull: false,
     },
+    email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+}, {
+    timestamps: true,
+    indexes: [
+        { unique: true, fields: ['organizationId', 'name'] }, // company names unique per org
+        { unique: true, fields: ['email'] }, // global unique email
+    ],
 });
 
 export default CompanyModel;
-

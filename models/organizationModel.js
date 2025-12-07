@@ -5,20 +5,18 @@ const OrganizationModel = sequelize.define('organization', {
     id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
         primaryKey: true,
+        allowNull: false,
     },
     name: {
         type: Sequelize.STRING,
         allowNull: false,
     },
-    createdByUserId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-    },
 }, {
-    createdAt: false,
-    updatedAt: false,
+    timestamps: true,
+    indexes: [
+        { unique: true, fields: ['name'] }, // optional, enforce global unique org names
+    ],
 });
 
 export default OrganizationModel;
