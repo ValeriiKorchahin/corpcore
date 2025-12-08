@@ -2,45 +2,36 @@ import { sequelize } from '../database/database.js';
 import UserModel from './userModel.js';
 import CompanyModel from './companyModel.js';
 import OrganizationModel from './organizationModel.js';
-import UserOrganizations from './userOrganizationsModel.js';
+import UserOrganizationsModel from './userOrganizationsModel.js';
+import UserCompanyModel from './userCompaniesModel.js';
 
+// Organization <-> Users (WITH ROLES)
 UserModel.belongsToMany(OrganizationModel, {
-    through: UserOrganizations,
+    through: UserOrganizationsModel,
     foreignKey: 'userId',
     as: 'organizations',
 });
 OrganizationModel.belongsToMany(UserModel, {
-    through: UserOrganizations,
+    through: UserOrganizationsModel,
     foreignKey: 'organizationId',
-    as: 'members',
+    as: 'users',
 });
 
-OrganizationModel.hasMany(CompanyModel, {
-    foreignKey: 'organizationId',
-    as: 'companies',
-    onDelete: 'CASCADE',
-});
-CompanyModel.belongsTo(OrganizationModel, {
-    foreignKey: 'organizationId',
-    as: 'organization',
-});
+// Organization -> Companies
+OrganizationModel.hasMany(CompanyModel, { foreignKey: 'organizationId' });
+CompanyModel.belongsTo(OrganizationModel, { foreignKey: 'organizationId' });
 
-UserModel.belongsToMany(CompanyModel, {
-    through: 'UserCompanies',
-    foreignKey: 'userId',
-    otherKey: 'companyId',
-});
-CompanyModel.belongsToMany(UserModel, {
-    through: 'UserCompanies',
-    foreignKey: 'companyId',
-    otherKey: 'userId',
-});
+// Company <-> Users (WITH ROLES)
+UserModel.belongsToMany(CompanyModel, { through: UserCompanyModel, foreignKey: 'userId' });
+CompanyModel.belongsToMany(UserModel, { through: UserCompanyModel, foreignKey: 'companyId' });
 
 export {
     sequelize,
     UserModel,
     CompanyModel,
     OrganizationModel,
+    UserOrganizationsModel,
+    UserCompanyModel,
 };
 
 

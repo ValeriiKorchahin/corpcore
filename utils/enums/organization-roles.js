@@ -1,7 +1,6 @@
-const Roles = {
+export const OrganizationRoles = {
     USER: 0,
     ADMIN: 1,
     MANAGER: 2,
 };
 
-export default Roles;

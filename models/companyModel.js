@@ -1,42 +1,42 @@
 import Sequelize from 'sequelize';
 import { sequelize } from '../database/database.js';
 
-const CompanyModel = sequelize.define('company', {
+const CompanyModel = sequelize.define('companies', {
     id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
-        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
     },
     name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
     },
     logoUrl: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
+        allowNull: true,
     },
     country: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
     },
     phone: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(30),
         allowNull: false,
     },
     email: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
     },
     address: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
+        allowNull: false,
+    },
+    organizationId: {
+        type: Sequelize.UUID,
         allowNull: false,
     },
 }, {
     timestamps: true,
-    indexes: [
-        { unique: true, fields: ['organizationId', 'name'] }, // company names unique per org
-        { unique: true, fields: ['email'] }, // global unique email
-    ],
 });
 
 export default CompanyModel;

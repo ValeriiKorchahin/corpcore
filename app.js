@@ -1,6 +1,7 @@
 import express from 'express';
 import authRoutes from './routes/authRoutes.js';
 import dotenv from 'dotenv';
+import './models/index.js';
 import { errorMiddleWare } from './middlewares/errorMiddleware.js';
 dotenv.config();
 

@@ -2,17 +2,16 @@ import bcrypt from 'bcrypt';
 import UserModel  from '../models/userModel.js';
 import  OrganizationModel  from '../models/organizationModel.js';
 import { sequelize } from '../database/database.js';
-import Role from '../utils/enums/roles.js';
 import { UnauthorizedError } from '../utils/errors/UnauthorizedError.js';
 import { ConflictError } from '../utils/errors/ConflictError.js';
-import UserRole from '../utils/enums/roles.js';
 import UserOrganizations from '../models/userOrganizationsModel.js';
+import { OrganizationRoles } from '../utils/enums/organization-roles.js';
 
 
 export const registerUser = async(value) => {
     const transaction = await sequelize.transaction();
     const { email, password, name, organizationName } = value;
-
+    debugger;
     try {
         // Check if user exists
         const existingUser = await UserModel.findOne({ where: { email }, transaction });
@@ -28,7 +27,6 @@ export const registerUser = async(value) => {
             name,
             email,
             password: hashedPassword,
-            role: Role.MANAGER, // global app role
         }, { transaction });
 
         // Create organization
@@ -40,7 +38,7 @@ export const registerUser = async(value) => {
         await UserOrganizations.create({
             userId: user.id,
             organizationId: organization.id,
-            role: UserRole.MANAGER,
+            role: OrganizationRoles.MANAGER,
         }, { transaction });
 
         await transaction.commit();
@@ -70,7 +68,10 @@ export const loginUser = async(value) => {
             {
                 model: OrganizationModel,
                 as: 'organizations',
-                through: { attributes: ['role'] }, // include role info
+                attributes: ['id', 'name'],
+                through: {
+                    attributes: ['role'],
+                },
             },
         ],
     });
@@ -87,6 +88,11 @@ export const loginUser = async(value) => {
     // Remove password from response
     const userData = user.toJSON();
     delete userData.password;
+    userData.organizations = userData.organizations.map(org => ({
+        id: org.id,
+        name: org.name,
+        role: org.UserOrganizations.role,
+    }));
 
     return userData;
 };

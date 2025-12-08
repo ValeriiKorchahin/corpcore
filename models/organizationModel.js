@@ -1,22 +1,19 @@
 import Sequelize from 'sequelize';
 import { sequelize } from '../database/database.js';
 
-const OrganizationModel = sequelize.define('organization', {
+const OrganizationModel = sequelize.define('organizations', {
     id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
-        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
     },
     name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
+        unique: true,
     },
 }, {
     timestamps: true,
-    indexes: [
-        { unique: true, fields: ['name'] }, // optional, enforce global unique org names
-    ],
 });
 
 export default OrganizationModel;

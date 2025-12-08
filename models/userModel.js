@@ -1,30 +1,24 @@
 import Sequelize from 'sequelize';
 import { sequelize } from '../database/database.js';
-import Roles from '../utils/enums/roles.js';
 
-const UserModel = sequelize.define('user', {
+const UserModel = sequelize.define('users', {
     id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
         allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
     },
     name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
     },
     email: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
+        allowNull: false,
         unique: true,
-        allowNull: false,
-    },
-    role: {
-        type: Sequelize.INTEGER,
-        defaultValue: Roles.USER,
-        allowNull: false,
     },
     password: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
     },
 }, {
@@ -32,3 +26,4 @@ const UserModel = sequelize.define('user', {
 });
 
 export default UserModel;
+

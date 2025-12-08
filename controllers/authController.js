@@ -10,7 +10,7 @@ export const register = async(req, res, next) => {
         }
         const user = await registerUser(value);
         return res.status(200).send({ user });
-    } catch(err) {
+    } catch (err) {
         next(err);
     }
 };
@@ -23,7 +23,7 @@ export const login = async(req, res, next) => {
         }
         const user = await loginUser(value);
         return res.status(200).send({ user });
-    } catch(err) {
+    } catch (err) {
         next(err);
     }
 };
