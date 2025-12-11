@@ -4,11 +4,12 @@ import { getAllCompanies } from '../services/companyService.js';
 
 export const getCompanies = async(req, res, next) => {
     try {
+        debugger;
         const companies = await getAllCompanies({
-            organizationId: req.user.organizationId,
-            search: req.query.search,
+            organizationId: req?.user?.organizationId,
+            search: req.query.search || '',
             limit: req.body.limit,
-            page: req.query.page,
+            page: req.body.page,
         });
         return res.status(200).json(companies);
     } catch(err) {

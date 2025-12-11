@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import { ConflictError } from '../utils/errors/ConflictError.js';
 
 export const getAllCompanies = async(payload) => {
+    debugger;
     const { organizationId, search, limit, page } = payload;
 
     const offset = (page - 1) * limit;
