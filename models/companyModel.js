@@ -13,6 +13,7 @@ const CompanyModel = sequelize.define('companies', {
     },
     logoUrl: {
         type: Sequelize.STRING(255),
+        defaultValue: null,
         allowNull: true,
     },
     country: {

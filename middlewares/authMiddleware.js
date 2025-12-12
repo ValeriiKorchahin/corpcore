@@ -4,7 +4,6 @@ import { UnauthorizedError } from '../utils/errors/UnauthorizedError.js';
 import { ForbiddenError } from '../utils/errors/ForbiddenError.js';
 
 export const authMiddleware = (req, res, next) => {
-    debugger;
     const header = req.headers.authorization;
 
     if (!header) {
@@ -18,6 +17,6 @@ export const authMiddleware = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (err) {
-        return next(ForbiddenError('Invalid or expired token'));
+        return next(new ForbiddenError('Invalid or expired token'));
     }
 };

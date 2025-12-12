@@ -1,11 +1,21 @@
 import { sequelize } from '../database/database.js';
 import { CompanyModel } from '../models/index.js';
 import { Op } from 'sequelize';
-import { ConflictError } from '../utils/errors/ConflictError.js';
 
-export const getAllCompanies = async(payload) => {
-    debugger;
+export const getCompanyList = async(payload) => {
     const { organizationId, search, limit, page } = payload;
+
+    if (!page || !limit) {
+        // no pagination → return all
+        const { rows: companies, count: total } = await CompanyModel.findAndCountAll();
+        return {
+            data: companies,
+            total: total,
+            page: 1,
+            limit: total,
+            order: [['createdAt', 'DESC']],
+        };
+    }
 
     const offset = (page - 1) * limit;
 
@@ -30,24 +40,23 @@ export const getAllCompanies = async(payload) => {
     };
 };
 
-// export const createCompany = async(value) => {
-//     const transaction = await sequelize.transaction();
-//     const { email, name } = value;
-//
-//     try {
-//         const existingCompany = await CompanyModel.findOne({
-//             where: {
-//                 [Op.or]: {
-//                     email,
-//                     name,
-//                 },
-//             },
-//             transaction,
-//         });
-//         if (existingCompany) {
-//             throw new ConflictError('Company already exists.');
-//         }
-//     } catch(err) {
-//
-//     }
-// }
+export const create = async(value, organizationId) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+        const company = await CompanyModel.create({
+            ...value,
+            organizationId: organizationId,
+        }, {
+            transaction,
+        });
+
+        await transaction.commit();
+
+        return company;
+    }catch (err) {
+        await transaction.rollback();
+        throw err;
+    }
+};
+
