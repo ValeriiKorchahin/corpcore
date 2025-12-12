@@ -1,6 +1,13 @@
 import { companySchema } from '../validators/companyValidator.js';
 import { BadRequestError } from '../utils/errors/BadRequestError.js';
-import { getCompanyList, create } from '../services/companyService.js';
+import {
+    getCompanyList,
+    create,
+    update,
+    remove,
+    fetchUserCompanies,
+    getCompanyById,
+} from '../services/companyService.js';
 
 export const getCompanies = async(req, res, next) => {
     try {
@@ -12,6 +19,26 @@ export const getCompanies = async(req, res, next) => {
         });
         return res.status(200).json(companies);
     } catch(err) {
+        next(err);
+    }
+};
+
+export const getCompany = async(req, res, next) => {
+    try {
+        const companyId = req.params.id;
+        const company = await getCompanyById(companyId);
+        return res.status(200).json(company);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getUserCompanies = async(req, res, next) => {
+    try {
+        const user = req.user;
+        const companies = await fetchUserCompanies(user);
+        return res.status(200).json(companies);
+    } catch (err) {
         next(err);
     }
 };
@@ -29,3 +56,28 @@ export const createCompany = async(req, res, next) => {
         next(err);
     }
 };
+
+export const updateCompany = async(req, res, next) => {
+    try {
+        const companyId = req.params.id;
+        const { error, value } = companySchema.validate(req.body);
+        if (error) {
+            throw new BadRequestError(error.details[0].message);
+        }
+        const company = await update(value, companyId);
+        return res.status(200).send({ company });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const deleteCompany = async(req, res, next) => {
+    try {
+        const companyId = req.params.id;
+        await remove(companyId);
+        return res.status(204).send();
+    } catch (err) {
+        next(err);
+    }
+};
+

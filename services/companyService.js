@@ -1,8 +1,8 @@
 import { sequelize } from '../database/database.js';
-import { CompanyModel } from '../models/index.js';
+import { CompanyModel, UserCompanyModel } from '../models/index.js';
 import { Op } from 'sequelize';
-import userCompaniesModel from '../models/userCompaniesModel.js';
 import { CompanyRoles } from '../utils/enums/company-roles.js';
+import { NotFoundError } from '../utils/errors/NotFoundError.js';
 
 export const getCompanyList = async(payload) => {
     const { organizationId, search, limit, page } = payload;
@@ -15,7 +15,6 @@ export const getCompanyList = async(payload) => {
             total: total,
             page: 1,
             limit: total,
-            order: [['createdAt', 'DESC']],
         };
     }
 
@@ -42,6 +41,43 @@ export const getCompanyList = async(payload) => {
     };
 };
 
+export const fetchUserCompanies = async(user) => {
+    const { organizationId , userId } = user;
+    const companies = await UserCompanyModel.findAll({
+        where: {
+            userId: userId,
+        },
+        include: [
+            {
+                model: CompanyModel,
+                attributes: [
+                    ['id', 'id'],
+                    ['name', 'name'],
+                ],
+                where: { organizationId: organizationId },
+            },
+        ],
+        attributes: ['role'],
+    });
+
+    const flatCompanies = companies.map(c => ({
+        id: c.company.id,
+        name: c.company.name,
+        role: c.role,
+    }));
+
+    return flatCompanies;
+};
+
+export const getCompanyById = async(companyId) => {
+    if (!companyId) {
+        throw new NotFoundError('Company not found');
+    }
+    const company = await CompanyModel.findByPk(companyId);
+
+    return company;
+};
+
 export const create = async(value, user) => {
     const transaction = await sequelize.transaction();
     const { organizationId, userId } = user;
@@ -52,21 +88,45 @@ export const create = async(value, user) => {
         }, {
             transaction,
         });
-        
-        await userCompaniesModel.create({
+        await UserCompanyModel.create({
             userId: userId,
             companyId: company.id,
             role: CompanyRoles.ADMIN, 
         }, {
             transaction,
         });
-
         await transaction.commit();
-
         return company;
     }catch (err) {
         await transaction.rollback();
         throw err;
     }
 };
+
+export const update = async(value, companyId) => {
+    try {
+        const company = await CompanyModel.findByPk(companyId);
+        if (!company) {
+            throw new NotFoundError('Company not found');
+        }
+        await company.update(value);
+        return company;
+    } catch (err) {
+        throw err;
+    }
+};
+
+export const remove = async(companyId) => {
+    try {
+        const company = await CompanyModel.findByPk(companyId);
+        if (!company) {
+            throw new NotFoundError('Company not found');
+        }
+        await company.destroy();
+        return company;
+    } catch (err) {
+        throw err;
+    }
+};
+
 

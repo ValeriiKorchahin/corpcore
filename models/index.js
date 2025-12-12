@@ -21,9 +21,22 @@ OrganizationModel.belongsToMany(UserModel, {
 OrganizationModel.hasMany(CompanyModel, { foreignKey: 'organizationId' });
 CompanyModel.belongsTo(OrganizationModel, { foreignKey: 'organizationId' });
 
+UserCompanyModel.belongsTo(CompanyModel, { foreignKey: 'companyId' });
+UserCompanyModel.belongsTo(UserModel, { foreignKey: 'userId' });
+
 // Company <-> Users (WITH ROLES)
-UserModel.belongsToMany(CompanyModel, { through: UserCompanyModel, foreignKey: 'userId' });
-CompanyModel.belongsToMany(UserModel, { through: UserCompanyModel, foreignKey: 'companyId' });
+UserModel.belongsToMany(CompanyModel, {
+    through: UserCompanyModel,
+    foreignKey: 'userId',
+    otherKey: 'companyId',
+    as: 'companies',
+});
+CompanyModel.belongsToMany(UserModel, {
+    through: UserCompanyModel,
+    foreignKey: 'companyId',
+    otherKey: 'userId',
+    as: 'users',
+});
 
 export {
     sequelize,
