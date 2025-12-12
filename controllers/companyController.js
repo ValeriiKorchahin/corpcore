@@ -18,12 +18,12 @@ export const getCompanies = async(req, res, next) => {
 
 export const createCompany = async(req, res, next) => {
     try {
-        const organizationId = req?.user?.organizationId;
+        const user = req?.user;
         const { error, value } = companySchema.validate(req.body);
         if (error) {
             throw new BadRequestError(error.details[0].message);
         }
-        const company = await create(value, organizationId);
+        const company = await create(value, user);
         return res.status(200).send({ company });
     } catch(err) {
         next(err);

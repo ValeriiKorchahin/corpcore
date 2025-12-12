@@ -8,6 +8,14 @@ const UserCompanyModel = sequelize.define('UserCompanies', {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
     },
+    userId: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+    },
+    companyId: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,  
+    },
     role: {
         type: Sequelize.INTEGER,
         defaultValue: CompanyRoles.USER,
