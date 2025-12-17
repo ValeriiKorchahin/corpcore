@@ -7,37 +7,31 @@ import { NotFoundError } from '../utils/errors/NotFoundError.js';
 export const getCompanyList = async(payload) => {
     const { organizationId, search, limit, page } = payload;
 
-    if (!page || !limit) {
-        // no pagination → return all
-        const { rows: companies, count: total } = await CompanyModel.findAndCountAll();
-        return {
-            data: companies,
-            total: total,
-            page: 1,
-            limit: total,
-        };
-    }
+    const isPaginationIncluded =
+        Number.isInteger(limit) && Number.isInteger(page);
 
-    const offset = (page - 1) * limit;
-
-    const where = {
+    const where= {
         organizationId: organizationId,
         ...(search && {
             name: { [Op.like]: `%${search}%` },
         }),
     };
 
+    const offset = isPaginationIncluded ?
+        (page - 1) * limit
+        : undefined;
+
     const { rows: companies, count: total } = await CompanyModel.findAndCountAll({
         where,
-        limit,
+        limit: isPaginationIncluded ? limit: undefined,
         offset,
         order: [['createdAt', 'DESC']], 
     });
     return {
         data: companies,
         total,
-        page,
-        limit,
+        page: isPaginationIncluded ? page : 1,
+        limit: isPaginationIncluded ? limit : total,
     };
 };
 
@@ -128,5 +122,3 @@ export const remove = async(companyId) => {
         throw err;
     }
 };
-
-
