@@ -26,6 +26,7 @@ export const getOrganizationUsers = async(payload) => {
             where: {
                 organizationId,
             },
+            attributes: ['role'],
             include: [
                 {
                     model: UserModel,
@@ -41,8 +42,13 @@ export const getOrganizationUsers = async(payload) => {
             order: [['createdAt', 'DESC']],
         });
 
+    const mappedUsers = users.map(u => ({
+        ...u.user.toJSON(),
+        role: u.role,
+    }));
+
     return {
-        data: users,
+        data: mappedUsers,
         total,
         page: isPaginationIncluded ? page : 1,
         limit: isPaginationIncluded ? limit : total,

@@ -24,6 +24,9 @@ CompanyModel.belongsTo(OrganizationModel, { foreignKey: 'organizationId' });
 UserCompanyModel.belongsTo(CompanyModel, { foreignKey: 'companyId' });
 UserCompanyModel.belongsTo(UserModel, { foreignKey: 'userId' });
 
+UserOrganizationsModel.belongsTo(OrganizationModel, { foreignKey: 'organizationId' });
+UserOrganizationsModel.belongsTo(UserModel, { foreignKey: 'userId' });
+
 // Company <-> Users (WITH ROLES)
 UserModel.belongsToMany(CompanyModel, {
     through: UserCompanyModel,

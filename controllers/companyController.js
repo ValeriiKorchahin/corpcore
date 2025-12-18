@@ -6,8 +6,9 @@ import {
     update,
     remove,
     fetchUserCompanies,
-    getCompanyById,
+    getCompanyById, createUser,
 } from '../services/companyService.js';
+import { userSchema } from '../validators/userValidator.js';
 
 export const getCompanies = async(req, res, next) => {
     try {
@@ -52,6 +53,22 @@ export const createCompany = async(req, res, next) => {
         }
         const company = await create(value, user);
         return res.status(200).send({ company });
+    } catch(err) {
+        next(err);
+    }
+};
+
+export const createCompanyUser = async(req, res, next) => {
+    try {
+        const companyId = req.params.id;
+        const organizationId = req?.user?.organizationId;
+        const body = req.body;
+        const { error, value } = userSchema.validate(body);
+        if (error) {
+            throw new BadRequestError(error.details[0].message);
+        }
+        const user = await createUser(companyId, organizationId, body);
+        return res.status(200).send({ user });
     } catch(err) {
         next(err);
     }

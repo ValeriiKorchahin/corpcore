@@ -3,6 +3,11 @@ import { CompanyModel, UserCompanyModel } from '../models/index.js';
 import { Op } from 'sequelize';
 import { CompanyRoles } from '../utils/enums/company-roles.js';
 import { NotFoundError } from '../utils/errors/NotFoundError.js';
+import UserModel from '../models/userModel.js';
+import { ConflictError } from '../utils/errors/ConflictError.js';
+import bcrypt from 'bcrypt';
+import UserOrganizations from '../models/userOrganizationsModel.js';
+import { OrganizationRoles } from '../utils/enums/organization-roles.js';
 
 export const getCompanyList = async(payload) => {
     const { organizationId, search, limit, page } = payload;
@@ -91,7 +96,51 @@ export const create = async(value, user) => {
         });
         await transaction.commit();
         return company;
-    }catch (err) {
+    } catch (err) {
+        await transaction.rollback();
+        throw err;
+    }
+};
+
+export const createUser = async(companyId, organizationId, body) => {
+    const transaction = await sequelize.transaction();
+    const { email, password, name, role } = body;
+
+    try {
+        const existingUser = await UserModel.findOne({ where: { email }, transaction });
+        if (existingUser) {
+            throw new ConflictError('User with this email already exists.');
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await UserModel.create({
+            email,
+            name,
+            password: hashedPassword,
+        }, { transaction });
+
+        await UserOrganizations.create({
+            userId: user.id,
+            organizationId: organizationId,
+            role: OrganizationRoles.USER,
+        }, { transaction });
+
+        await UserCompanyModel.create({
+            userId: user.id,
+            companyId: companyId,
+            role: role,
+        }, { transaction });
+
+        await transaction.commit();
+
+        const userData = user.toJSON();
+        delete userData.password;
+        userData.role = role;
+
+        return userData;
+
+    } catch (err) {
         await transaction.rollback();
         throw err;
     }

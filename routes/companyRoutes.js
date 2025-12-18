@@ -4,7 +4,7 @@ import {
     getCompanies,
     updateCompany,
     deleteCompany,
-    getUserCompanies, getCompany,
+    getUserCompanies, getCompany, createCompanyUser,
 } from '../controllers/companyController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -15,6 +15,9 @@ router.post('/list', authMiddleware, getCompanies);
 
 //Get User Companies
 router.get('/user', authMiddleware, getUserCompanies);
+
+// Create User In Company
+router.post('/:id/user', authMiddleware, createCompanyUser);
 
 // Get Company
 router.get('/:id', authMiddleware, getCompany);
