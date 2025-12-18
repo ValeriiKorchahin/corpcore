@@ -13,7 +13,6 @@ export const registerUser = async(value) => {
     const transaction = await sequelize.transaction();
     const { email, password, name, organizationName } = value;
     try {
-        debugger;
         // Check if user exists
         const existingUser = await UserModel.findOne({ where: { email }, transaction });
         if (existingUser) {

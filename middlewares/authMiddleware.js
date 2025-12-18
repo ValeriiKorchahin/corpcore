@@ -7,7 +7,7 @@ export const authMiddleware = (req, res, next) => {
     const header = req.headers.authorization;
 
     if (!header) {
-        return new UnauthorizedError('No token provided');
+        return next(new UnauthorizedError('No token provided'));
     }
 
     const token = header.split(' ')[1];
@@ -17,6 +17,6 @@ export const authMiddleware = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (err) {
-        return new ForbiddenError('Invalid or expired token');
+        return next(new ForbiddenError('Invalid or expired token'));
     }
 };
