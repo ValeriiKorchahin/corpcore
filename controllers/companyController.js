@@ -53,7 +53,7 @@ export const createCompany = async(req, res, next) => {
             throw new BadRequestError(error.details[0].message);
         }
         const company = await create(value, user);
-        return res.status(200).send({ company });
+        return res.status(200).send(company);
     } catch(err) {
         next(err);
     }
@@ -69,7 +69,7 @@ export const createCompanyUser = async(req, res, next) => {
             throw new BadRequestError(error.details[0].message);
         }
         const user = await createUser(companyId, organizationId, value);
-        return res.status(200).send({ user });
+        return res.status(200).send(user);
     } catch(err) {
         next(err);
     }
@@ -83,7 +83,7 @@ export const updateCompany = async(req, res, next) => {
             throw new BadRequestError(error.details[0].message);
         }
         const company = await update(value, companyId);
-        return res.status(200).send({ company });
+        return res.status(200).send(company);
     } catch (err) {
         next(err);
     }
